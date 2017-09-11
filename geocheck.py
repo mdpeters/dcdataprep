@@ -22,13 +22,14 @@ def processGeoSubjects(entries):
 	#add values not found to new_geo list
 	for row in entries:
 		for i in geo_indexes:
-			if row[i] != "":
+			if row[i].strip() != "":
 				for geo in geo_subjects:
-					if row[i] == geo[0]:
+					if row[i].strip() == geo[0]:
 						geo_matched = True
-						break;
-				if geo_matched == True:
-					new_geo.add(row[i])
+						break
+				if geo_matched == False:
+					new_geo.add(row[i].strip())
+				else:
 					geo_matched = False
 	# add new subjects to the geo subject list for output and manual checking
 	for new in new_geo:
