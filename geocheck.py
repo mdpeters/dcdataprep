@@ -8,7 +8,7 @@ def processGeoSubjects(entries):
 	geo_matched = False
 	#pull subject translations from csv file
 	with open("geo.csv", 'rt') as g:
-		reader = csv.reader(g, dialect='excel', encoding='utf-8')
+		reader = csv.reader(g, dialect='excel', encoding='utf8')
 		for row in reader:
 			geo_subjects.append(row)
 	#get the indexes of the geo subject columns
@@ -59,7 +59,7 @@ def main():
 
 	#import container data from csv file, csv should be encoded UTF-8
 	with open(inputfile, 'rt') as f:
-		reader = csv.reader(f, dialect='excel', encoding='utf-8')
+		reader = csv.reader(f, dialect='excel', encoding='utf8')
 		for row in reader:
 			entries.append(row)
 	cleanFields(entries)

@@ -171,7 +171,7 @@ def main():
 	outputfile = args.csv + '_processed.csv'
 
 	#import container data from csv file, csv should be encoded UTF-8
-	with open(inputfile, 'rt', encoding='utf-8') as f:
+	with open(inputfile, 'rt', encoding='utf8') as f:
 		reader = csv.reader(f, dialect='excel')
 		for row in reader:
 			entries.append(row)
@@ -180,7 +180,7 @@ def main():
 	addLocalIdentifier(entries, "scarare")
 	addRelatedResource(entries)
 	processGeoSubjects(entries)
-	with open(outputfile, 'wb', encoding='utf-8') as w:
+	with open(outputfile, 'wb', encoding='utf8') as w:
 		writer = csv.writer(w)
 		writer.writerows(entries)
 
