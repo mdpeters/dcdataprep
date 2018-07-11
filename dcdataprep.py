@@ -1,12 +1,9 @@
 #!/usr/bin/python
 import csv, sys, argparse
 
-reload(sys)  
-sys.setdefaultencoding('utf8')
-
 def dateIsYear(date):
 	if len(date) == 4:
-		try: 
+		try:
 			int(date)
 			return True
 		except ValueError:
@@ -26,8 +23,8 @@ def processQuestionableDate(date):
 			return ["", ""]
 	else:
 		return ["", ""]
-		
-		
+
+
 def processBetweenDate(date):
 	dates = ["", ""]
 	if date.startswith("between "): #hack it off  and only continue processing if it was present in the first place
@@ -40,13 +37,13 @@ def processBetweenDate(date):
 			dates[0] = dates[0].strip()+"-01-01"
 			dates[1] = dates[1].strip()+"-12-31"
 	return dates
-		
+
 def stripDateBrackets(date):
 	if date.startswith('[') and date.endswith(']'):
 		return date[1:-1]
 	else:
-		return date	
-		
+		return date
+
 def standarizeCirca(date):
 	if date.startswith("c") or date.startswith("ca") or date.startswith("circa"):
 		try:
@@ -60,7 +57,7 @@ def standarizeCirca(date):
 				return date
 	else:
 		return date
-		
+
 def processCircaDate(date):
 	dates = ["",""]
 	if date.startswith("circa "):
@@ -73,8 +70,8 @@ def processCircaDate(date):
 		dates[0] = date + "-01-01"
 		dates[1] = date + "-12-31"
 	return dates
-		
-	
+
+
 def processDates(entries):
 	cr_date = ""
 	try:
@@ -89,7 +86,7 @@ def processDates(entries):
 			if "Date:creation" in row:
 				row.insert(begin_date_ind, "Begin date")
 				row.insert(end_date_ind, "End date")
-				
+
 			else:
 				cr_date = row[cr_date_ind].strip()
 				cr_date = stripDateBrackets(cr_date)
@@ -108,12 +105,12 @@ def processDates(entries):
 					dates = processCircaDate(cr_date)
 				row.insert(begin_date_ind, dates[0])
 				row.insert(end_date_ind, dates[1])
-		
+
 
 	except:
 		print "Unexpected error:", sys.exc_info()[0]
 		raise
-	
+
 def processGeoSubjects(entries):
 	geo_indexes = []
 	geo_subjects = []
@@ -133,7 +130,7 @@ def processGeoSubjects(entries):
 				for geo in geo_subjects:
 					if row[i] == geo[0]:
 						row[i] = geo[1]
-						
+
 def addLocalIdentifier(entries, identifier):
 	insertIndex = entries[0].index("Identifier:roger record") + 1
 	for row in entries:
@@ -141,9 +138,18 @@ def addLocalIdentifier(entries, identifier):
 			row.insert(insertIndex, "Identifier:local")
 		else:
 			row.insert(insertIndex, identifier)
-			
+
+def addRelatedResource(entries):
+	roger_index = entries[0].index("Identifier:roger record")
+	insert_index = roger_index + 2
+	for row in entries:
+		if "Identifier:roger record" in row:
+			row.insert(insert_index, "Related resource:related")
+		else:
+			row.insert(insert_index, "Roger record @ http://roger.ucsd.edu/record=" + row[roger_index] + "~S9")
+
 #add code to clean straggling punctuation at beginning/end of field entries
-def cleanFields(entries): 
+def cleanFields(entries):
 	for row in entries:
 		for entry in row:
 			entry = entry.strip()
@@ -151,8 +157,8 @@ def cleanFields(entries):
 				entry = entry[1:]
 			if entry.endswith(',') or entry.endswith(';') or entry.endswith(':'):
 				entry = entry[0:-1]
-		
-			
+
+
 def main():
 	entries = []
 	inputfile = ''
@@ -160,22 +166,23 @@ def main():
 	argsparser = argparse.ArgumentParser()
 	argsparser.add_argument('csv', help='csv filename (without the .csv extension)')
 	args = argsparser.parse_args()
-			
+
 	inputfile = args.csv + '.csv'
 	outputfile = args.csv + '_processed.csv'
-	
+
 	#import container data from csv file, csv should be encoded UTF-8
-	with open(inputfile, 'rt') as f:
+	with open(inputfile, 'rt', encoding='utf-8') as f:
 		reader = csv.reader(f, dialect='excel')
 		for row in reader:
 			entries.append(row)
 	cleanFields(entries)
 	processDates(entries)
 	addLocalIdentifier(entries, "scarare")
+	addRelatedResource(entries)
 	processGeoSubjects(entries)
-	with open(outputfile, 'wb') as w:
+	with open(outputfile, 'wb', encoding='utf-8') as w:
 		writer = csv.writer(w)
 		writer.writerows(entries)
-	
+
 if __name__ == "__main__":
    main()

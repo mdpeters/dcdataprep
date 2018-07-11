@@ -1,9 +1,6 @@
 #!/usr/bin/python
 import csv, sys, argparse
 
-reload(sys)  
-sys.setdefaultencoding('utf8')
-	
 def processGeoSubjects(entries):
 	geo_indexes = []
 	geo_subjects = []
@@ -11,7 +8,7 @@ def processGeoSubjects(entries):
 	geo_matched = False
 	#pull subject translations from csv file
 	with open("geo.csv", 'rt') as g:
-		reader = csv.reader(g, dialect='excel')
+		reader = csv.reader(g, dialect='excel', encoding='utf-8')
 		for row in reader:
 			geo_subjects.append(row)
 	#get the indexes of the geo subject columns
@@ -38,10 +35,10 @@ def processGeoSubjects(entries):
 		writer = csv.writer(ng, dialect='excel')
 		for row in geo_subjects:
 			writer.writerow(row)
-						
-			
+
+
 #add code to clean straggling punctuation at beginning/end of field entries
-def cleanFields(entries): 
+def cleanFields(entries):
 	for row in entries:
 		for entry in row:
 			entry = entry.strip()
@@ -49,24 +46,24 @@ def cleanFields(entries):
 				entry = entry[1:]
 			if entry.endswith(',') or entry.endswith(';') or entry.endswith(':'):
 				entry = entry[0:-1]
-		
-			
+
+
 def main():
 	entries = []
 	inputfile = ''
 	outputfile = ''
 	argsparser = argparse.ArgumentParser()
 	argsparser.add_argument('csv', help='csv filename')
-	args = argsparser.parse_args()	
+	args = argsparser.parse_args()
 	inputfile = args.csv
-	
+
 	#import container data from csv file, csv should be encoded UTF-8
 	with open(inputfile, 'rt') as f:
-		reader = csv.reader(f, dialect='excel')
+		reader = csv.reader(f, dialect='excel', encoding='utf-8')
 		for row in reader:
 			entries.append(row)
 	cleanFields(entries)
 	processGeoSubjects(entries)
-	
+
 if __name__ == "__main__":
    main()
